@@ -40,13 +40,14 @@
 						<thead>
 							<tr>
 								<th>Running Services</th>
-
+                                <th>Pass/Fail Status</th>
 							</tr>
 						</thead>
 						<tbody>
 							<c:forEach var="service" items="${services }">
 								<tr>
 									<td><a href="/totalServicesClassCurrentlyRunning?serviceName=${service}"><span>${service}</span></a></td>
+									<td><a href="/servicesResultPercentageCount?serviceName=${service}"><span>status</span></a></td>
 								</tr>
 							</c:forEach>
 						</tbody>

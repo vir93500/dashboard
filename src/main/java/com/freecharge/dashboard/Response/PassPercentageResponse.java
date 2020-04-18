@@ -12,4 +12,5 @@ import org.springframework.stereotype.Component;
 public class PassPercentageResponse {
     private double passPercentage;
     private double failPercentage;
+    private double skipPercentage;
 }

@@ -8,6 +8,7 @@ import com.freecharge.dashboard.Model.DashBoardResult;
 import com.freecharge.dashboard.Repository.DashBoardResultRespository;
 import com.freecharge.dashboard.Request.CurrentlyRunningTestMethodRequest;
 import com.freecharge.dashboard.Request.DashboardResultRequest;
+import com.freecharge.dashboard.Request.KeyValue;
 import com.freecharge.dashboard.Response.*;
 import com.freecharge.dashboard.Services.Impl.ResultPercentageServicesImpl;
 import com.freecharge.dashboard.Services.ResultPercentageServices;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +32,7 @@ public class DashboardController {
 
     public static final String PASS="Pass";
     public static final String FAIL="Fail";
+    public static final String SKIP="Skip";
     //ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
@@ -131,6 +134,39 @@ public class DashboardController {
     }
 
 
+    @GetMapping(value ="/servicesResultPercentageCount")
+    @ResponseStatus(HttpStatus.OK)
+    public String servicesResultPercentageCount(HttpServletRequest request,@RequestParam(name="serviceName") String serviceName){
+        final String date = String.valueOf(java.time.LocalDate.now());
+        final int passCount =  dashBoardResultRespository.passfailCount(serviceName,PASS,date);
+        final int failCount =  dashBoardResultRespository.passfailCount(serviceName,FAIL,date);
+        final int skipCount =  dashBoardResultRespository.passfailCount(serviceName,SKIP,date);
+       // final double passPercentage =  resultPercentageServicesImpl.passPercentageCount(passCount,failCount);
+
+        if(passCount==0 && failCount==0)
+            throw new PassPercentageNotFound();
+       else {
+            passPercentageResponse.setPassPercentage(passCount);
+            passPercentageResponse.setFailPercentage(failCount);
+            passPercentageResponse.setSkipPercentage(skipCount);
+        }
+        final List<KeyValue> pieDataList;
+
+            pieDataList = new ArrayList<KeyValue>();
+
+      /*  pieDataList.add(new KeyValue("Pass", "50"));
+        pieDataList.add(new KeyValue("Fail", "10"));
+        pieDataList.add(new KeyValue("Skip", "29"));*/
+
+            pieDataList.add(new KeyValue("Pass", passPercentageResponse.getPassPercentage()+""));
+            pieDataList.add(new KeyValue("Fail", passPercentageResponse.getFailPercentage()+""));
+            pieDataList.add(new KeyValue("Skip", passPercentageResponse.getSkipPercentage()+""));
+            request.setAttribute("pieDataList", pieDataList);
+
+        return "piechart";
+    }
+
+
    /* @GetMapping(value ="/totalServicesMethodCurrentlyRunning")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<CurrentlyRunningTestMethodResponse> totalServicesMethodCurrentlyRunning(@RequestBody CurrentlyRunningTestMethodRequest currentlyRunningTestMethodRequest){
@@ -210,7 +246,7 @@ public class DashboardController {
 
 
 
-    @GetMapping(value ="/servicesResultPercentageCount")
+    /*@GetMapping(value ="/servicesResultPercentageCount")
     @ResponseStatus(HttpStatus.OK)
         public ResponseEntity<PassPercentageResponse> servicesResultPercentageCount(@RequestParam(name="serviceName") String serviceName){
         final String date = String.valueOf(java.time.LocalDate.now());
@@ -229,5 +265,5 @@ public class DashboardController {
             passPercentageResponse.setFailPercentage(100 - passPercentage);
         }
         return new ResponseEntity<PassPercentageResponse>(passPercentageResponse,HttpStatus.OK);
-    }
+    }*/
 }
