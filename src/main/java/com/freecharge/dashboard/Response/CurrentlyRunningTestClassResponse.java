@@ -13,4 +13,5 @@ import java.util.List;
 @Component
 public class CurrentlyRunningTestClassResponse {
     private List<String> testClasses;
+    private String serviceName;
 }

@@ -31,7 +31,7 @@
 	</div>
 
 <c:choose>
-		<c:when test="${mode=='ALL_TEST_CLASSES' }">
+		<c:when test="${mode=='ALL_TEST_CLASSES_METHODS' }">
 			<div class="container text-center" id="tasksDiv">
 				<h3>Automation DashBoard</h3>
 				<hr>
@@ -39,17 +39,15 @@
 					<table class="table table-striped table-bordered">
 						<thead>
 							<tr>
-								<th>Running Service</th>
-                                <th>Running classes</th>
+                                <th>Running Methods</th>
+                                <th>Status</th>
 							</tr>
 						</thead>
 						<tbody>
-
-							<c:forEach var="testclass" items="${testclasses.testClasses }">
+							<c:forEach var="mapItem" items="${testMethodAttribute}">
 								<tr>
-                                    <td><span>${testclasses.serviceName}</span></td>
-									<td><a href="/totalServicesMethodCurrentlyRunning?serviceName=${testclasses.serviceName}&className=${testclass}"><span>${testclass}</span></a></td>
-
+                                    <td><span>${mapItem.key}</span></td>
+                                    <td><span>${mapItem.value}</span></td>
 								</tr>
 							</c:forEach>
 						</tbody>
@@ -57,6 +55,7 @@
 				</div>
 			</div>
 		</c:when>
+
 
 </c:choose>
 

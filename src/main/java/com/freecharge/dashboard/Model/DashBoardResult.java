@@ -1,12 +1,14 @@
 package com.freecharge.dashboard.Model;
 
 import lombok.Data;
+import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "backend_automation")
 @Data
+@Component
 public class DashBoardResult {
 
     @Id

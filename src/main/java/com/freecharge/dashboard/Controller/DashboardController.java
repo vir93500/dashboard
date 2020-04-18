@@ -4,6 +4,7 @@ import com.freecharge.dashboard.ExceptionHandler.NoMethodFound;
 import com.freecharge.dashboard.ExceptionHandler.NoServicesFound;
 import com.freecharge.dashboard.ExceptionHandler.NoTestClassesFound;
 import com.freecharge.dashboard.ExceptionHandler.PassPercentageNotFound;
+import com.freecharge.dashboard.Model.DashBoardResult;
 import com.freecharge.dashboard.Repository.DashBoardResultRespository;
 import com.freecharge.dashboard.Request.CurrentlyRunningTestMethodRequest;
 import com.freecharge.dashboard.Request.DashboardResultRequest;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -50,6 +52,9 @@ public class DashboardController {
 
     @Autowired
     PassPercentageResponse passPercentageResponse;
+
+    @Autowired
+    DashBoardResult dashBoardResult;
 
     @RequestMapping("/")
     public String home(Map<String, Object> model) {
@@ -94,27 +99,35 @@ public class DashboardController {
     public String totalServicesMethodCurrentlyRunning(HttpServletRequest request,@RequestParam(name="serviceName") String serviceName){
         final String date = String.valueOf(java.time.LocalDate.now());
         final List<String> listTestClasses =  dashBoardResultRespository.currentlyRunningServicesClass(serviceName,date);
-        currentlyRunningTestClassResponse.setTestClasses(listTestClasses);
 
+        currentlyRunningTestClassResponse.setTestClasses(listTestClasses);
+        currentlyRunningTestClassResponse.setServiceName(serviceName);
         if(currentlyRunningTestClassResponse.getTestClasses().isEmpty()){
             throw new NoTestClassesFound();
         }
-        request.setAttribute("testclasses", currentlyRunningTestClassResponse.getTestClasses());
+        request.setAttribute("testclasses", currentlyRunningTestClassResponse);
         request.setAttribute("mode", "ALL_TEST_CLASSES");
         return "testclasses";
     }
 
     @GetMapping(value ="/totalServicesMethodCurrentlyRunning")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<CurrentlyRunningTestMethodResponse> totalServicesMethodCurrentlyRunning(HttpServletRequest request,@RequestParam(name="serviceName") String serviceName,@RequestParam(name="className") String className){
+    public String totalServicesMethodCurrentlyRunning(HttpServletRequest request, @RequestParam(name="serviceName") String serviceName, @RequestParam(name="className") String className){
         final String date = String.valueOf(java.time.LocalDate.now());
-        final List<String> listTestClasses =  dashBoardResultRespository.currentlyRunningServicesMethod(serviceName,className,date);
-        currentlyRunningTestMethodResponse.setTestMethods(listTestClasses);
-
-        if(currentlyRunningTestMethodResponse.getTestMethods().isEmpty()){
+        final List<String> testMethodResponse =  dashBoardResultRespository.currentlyRunningServicesMethod(serviceName,className,date);
+        final List<String> testMethodstatus = dashBoardResultRespository.currentlyRunningServicesMethodStatus(serviceName,className,date);
+        if(testMethodResponse.isEmpty()){
             throw new NoTestClassesFound();
         }
-        return new ResponseEntity<CurrentlyRunningTestMethodResponse>(currentlyRunningTestMethodResponse,HttpStatus.OK);
+        Map<String,String> map = new HashMap<>();
+        for (int i = 0; i <testMethodResponse.size() ; i++) {
+            map.put(testMethodResponse.get(i),testMethodstatus.get(i));
+        }
+        request.setAttribute("serviceName",serviceName);
+        request.setAttribute("testMethodAttribute", map);
+        request.setAttribute("mode", "ALL_TEST_CLASSES_METHODS");
+
+         return "testMethods";
     }
 
 

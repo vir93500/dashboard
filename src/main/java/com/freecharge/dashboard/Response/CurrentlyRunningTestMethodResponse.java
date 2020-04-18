@@ -12,5 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @Component
 public class CurrentlyRunningTestMethodResponse {
+    private String testClasses;
     private List<String> testMethods;
+    private List<String> testMethodStatus;
 }
