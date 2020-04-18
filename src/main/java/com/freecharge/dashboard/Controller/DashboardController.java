@@ -15,12 +15,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 //import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 
-@RestController
+@Controller
 public class DashboardController {
 
     public static final String PASS="Pass";
@@ -48,9 +51,107 @@ public class DashboardController {
     @Autowired
     PassPercentageResponse passPercentageResponse;
 
+    @RequestMapping("/")
+    public String home(Map<String, Object> model) {
+        model.put("message", "HowToDoInJava Reader !!");
+        return "index";
+    }
+
+    @RequestMapping("/next")
+    public String next(Map<String, Object> model) {
+        model.put("message", "You are in new page !!");
+        return "next";
+    }
+
+   /* @GetMapping("/show-users")
+    public String showAllUsers(HttpServletRequest request) {
+        request.setAttribute("users", userService.showAllUsers());
+        request.setAttribute("mode", "ALL_USERS");
+        return "welcomepage";
+    }*/
+//{"listServices":["orchestrator","checkout","kycService"]}
+
+
     @GetMapping(value ="/totalServicesCurrentlyRunning")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<CurrentlyRunningServices> totalServicesCurrentlyRunning(){
+    public String totalServicesCurrentlyRunning(HttpServletRequest request){
+        final String date = String.valueOf(java.time.LocalDate.now());
+        final List<String> listServices =  dashBoardResultRespository.currentlyRunningServices(date);
+        currentlyRunningServices.setListServices(listServices);
+
+        if(currentlyRunningServices.getListServices().isEmpty()){
+            throw new NoServicesFound();
+        }
+        request.setAttribute("services", currentlyRunningServices.getListServices());
+        request.setAttribute("mode", "ALL_SERVICES");
+
+        return "welcomepage";
+    }
+
+
+    @GetMapping(value ="/totalServicesClassCurrentlyRunning")
+    @ResponseStatus(HttpStatus.OK)
+    public String totalServicesMethodCurrentlyRunning(HttpServletRequest request,@RequestParam(name="serviceName") String serviceName){
+        final String date = String.valueOf(java.time.LocalDate.now());
+        final List<String> listTestClasses =  dashBoardResultRespository.currentlyRunningServicesClass(serviceName,date);
+        currentlyRunningTestClassResponse.setTestClasses(listTestClasses);
+
+        if(currentlyRunningTestClassResponse.getTestClasses().isEmpty()){
+            throw new NoTestClassesFound();
+        }
+        request.setAttribute("testclasses", currentlyRunningTestClassResponse.getTestClasses());
+        request.setAttribute("mode", "ALL_TEST_CLASSES");
+        return "testclasses";
+    }
+
+    @GetMapping(value ="/totalServicesMethodCurrentlyRunning")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<CurrentlyRunningTestMethodResponse> totalServicesMethodCurrentlyRunning(HttpServletRequest request,@RequestParam(name="serviceName") String serviceName,@RequestParam(name="className") String className){
+        final String date = String.valueOf(java.time.LocalDate.now());
+        final List<String> listTestClasses =  dashBoardResultRespository.currentlyRunningServicesMethod(serviceName,className,date);
+        currentlyRunningTestMethodResponse.setTestMethods(listTestClasses);
+
+        if(currentlyRunningTestMethodResponse.getTestMethods().isEmpty()){
+            throw new NoTestClassesFound();
+        }
+        return new ResponseEntity<CurrentlyRunningTestMethodResponse>(currentlyRunningTestMethodResponse,HttpStatus.OK);
+    }
+
+
+   /* @GetMapping(value ="/totalServicesMethodCurrentlyRunning")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<CurrentlyRunningTestMethodResponse> totalServicesMethodCurrentlyRunning(@RequestBody CurrentlyRunningTestMethodRequest currentlyRunningTestMethodRequest){
+        final String date = String.valueOf(java.time.LocalDate.now());
+        final List<String> listTestClasses =  dashBoardResultRespository.currentlyRunningServicesMethod(currentlyRunningTestMethodRequest.getServiceName(),currentlyRunningTestMethodRequest.getClassName(),date);
+        currentlyRunningTestMethodResponse.setTestMethods(listTestClasses);
+
+        if(currentlyRunningTestMethodResponse.getTestMethods().isEmpty()){
+            throw new NoTestClassesFound();
+        }
+        return new ResponseEntity<CurrentlyRunningTestMethodResponse>(currentlyRunningTestMethodResponse,HttpStatus.OK);
+    }*/
+
+
+    /*@GetMapping(value ="/totalServicesClassCurrentlyRunning")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<CurrentlyRunningTestClassResponse> totalServicesMethodCurrentlyRunning(@RequestParam(name="serviceName") String serviceName){
+        final String date = String.valueOf(java.time.LocalDate.now());
+        final List<String> listTestClasses =  dashBoardResultRespository.currentlyRunningServicesClass(serviceName,date);
+        currentlyRunningTestClassResponse.setTestClasses(listTestClasses);
+
+        if(currentlyRunningTestClassResponse.getTestClasses().isEmpty()){
+            throw new NoTestClassesFound();
+        }
+        return new ResponseEntity<CurrentlyRunningTestClassResponse>(currentlyRunningTestClassResponse,HttpStatus.OK);
+    }*/
+
+
+
+
+
+    /*@GetMapping(value ="/totalServicesCurrentlyRunning")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<CurrentlyRunningServices> totalServicesCurrentlyRunning(HttpServletRequest request){
        final String date = String.valueOf(java.time.LocalDate.now());
         final List<String> listServices =  dashBoardResultRespository.currentlyRunningServices(date);
           currentlyRunningServices.setListServices(listServices);
@@ -59,7 +160,7 @@ public class DashboardController {
             throw new NoServicesFound();
         }
         return new ResponseEntity<CurrentlyRunningServices>(currentlyRunningServices,HttpStatus.OK);
-    }
+    }*/
 
     @GetMapping(value ="/totalServicesRunParticularDay")
     @ResponseStatus(HttpStatus.OK)
@@ -92,31 +193,9 @@ public class DashboardController {
         return new ResponseEntity<PassFailCountResponse>(passFailCountResponse,HttpStatus.OK);
     }
 
-    @GetMapping(value ="/totalServicesClassCurrentlyRunning")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<CurrentlyRunningTestClassResponse> totalServicesMethodCurrentlyRunning(@RequestParam(name="serviceName") String serviceName){
-        final String date = String.valueOf(java.time.LocalDate.now());
-        final List<String> listTestClasses =  dashBoardResultRespository.currentlyRunningServicesClass(serviceName,date);
-        currentlyRunningTestClassResponse.setTestClasses(listTestClasses);
 
-        if(currentlyRunningTestClassResponse.getTestClasses().isEmpty()){
-            throw new NoTestClassesFound();
-        }
-        return new ResponseEntity<CurrentlyRunningTestClassResponse>(currentlyRunningTestClassResponse,HttpStatus.OK);
-    }
 
-    @GetMapping(value ="/totalServicesMethodCurrentlyRunning")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<CurrentlyRunningTestMethodResponse> totalServicesMethodCurrentlyRunning(@RequestBody CurrentlyRunningTestMethodRequest currentlyRunningTestMethodRequest){
-        final String date = String.valueOf(java.time.LocalDate.now());
-        final List<String> listTestClasses =  dashBoardResultRespository.currentlyRunningServicesMethod(currentlyRunningTestMethodRequest.getServiceName(),currentlyRunningTestMethodRequest.getClassName(),date);
-        currentlyRunningTestMethodResponse.setTestMethods(listTestClasses);
 
-        if(currentlyRunningTestMethodResponse.getTestMethods().isEmpty()){
-            throw new NoTestClassesFound();
-        }
-        return new ResponseEntity<CurrentlyRunningTestMethodResponse>(currentlyRunningTestMethodResponse,HttpStatus.OK);
-    }
 
     @GetMapping(value ="/servicesResultPercentageCount")
     @ResponseStatus(HttpStatus.OK)
