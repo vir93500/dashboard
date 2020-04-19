@@ -59,27 +59,6 @@ public class DashboardController {
     @Autowired
     DashBoardResult dashBoardResult;
 
-    @RequestMapping("/")
-    public String home(Map<String, Object> model) {
-        model.put("message", "HowToDoInJava Reader !!");
-        return "index";
-    }
-
-    @RequestMapping("/next")
-    public String next(Map<String, Object> model) {
-        model.put("message", "You are in new page !!");
-        return "next";
-    }
-
-   /* @GetMapping("/show-users")
-    public String showAllUsers(HttpServletRequest request) {
-        request.setAttribute("users", userService.showAllUsers());
-        request.setAttribute("mode", "ALL_USERS");
-        return "welcomepage";
-    }*/
-//{"listServices":["orchestrator","checkout","kycService"]}
-
-
     @GetMapping(value ="/totalServicesCurrentlyRunning")
     @ResponseStatus(HttpStatus.OK)
     public String totalServicesCurrentlyRunning(HttpServletRequest request){

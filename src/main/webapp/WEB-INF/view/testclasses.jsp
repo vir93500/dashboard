@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Cache-Control" content="no-cache">
 <meta http-equiv="Expires" content="sat, 01 Dec 2001 00:00:00 GMT">
-<title>tecno-tab | home</title>
+<title>Freecharge | home</title>
 <link href="static/css/bootstrap.min.css" rel="stylesheet">
 <link href="static/css/style.css" rel="stylesheet">
 <!--[if lt IE 9]>
@@ -19,28 +19,32 @@
 <body>
 	<div role="navigation">
 		<div class="navbar navbar-inverse">
-			<a href="/welcome" class="navbar-brand">Tecno-Tab</a>
+			<div class="navbar-brand">Freecharge</div>
 			<div class="navbar-collapse collapse">
 				<ul class="nav navbar-nav">
-					<li><a href="/login">Login</a></li>
-					<li><a href="/register">New Registration</a></li>
-					<li><a href="/show-users">All Users</a></li>
+
 				</ul>
 			</div>
 		</div>
 	</div>
-
+<%
+  response.setIntHeader("Refresh", 5);
+%>
 <c:choose>
 		<c:when test="${mode=='ALL_TEST_CLASSES' }">
 			<div class="container text-center" id="tasksDiv">
 				<h3>Automation DashBoard</h3>
+
+				<div align="left">
+                <button type="button" name="back" onclick="history.back()">Back to Services page</button>
+                </div>
 				<hr>
 				<div class="table-responsive">
 					<table class="table table-striped table-bordered">
 						<thead>
 							<tr>
 								<th>Running Service</th>
-                                <th>Running classes</th>
+                                <th>Running Test Classes</th>
 
 							</tr>
 						</thead>
